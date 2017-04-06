@@ -1,0 +1,202 @@
+Course: CS316 - Fall 2016
+Assignment: Project 3 - PHP
+Due: Monday, Nov 21st, 23:59:59
+
+
+Description:
+You will write a very basic web application in PHP that will create
+a dynamic search form. The PHP script will take user input from the
+form and perform basic searches on files local to the webserver.
+Searches will involve JSON objects stored in those files.
+
+Requirements:
+- You must submit your assignment as a ZIP file (even if just one
+file) to the CSPortal by the due date/time.
+- You can work in teams of two. Only one team member should turn
+in the assignment. I will grade the latest version submitted by
+any team member (deducting any late penalties accordingly).
+- Your name(s) should be at the top of the source course and in 
+any documentation files.
+- Your PHP can use the modules included in the basic system.
+- You cannot use any external modules. You cannot install any extra 
+modules. The assignment can and should be completed with the 
+modules listed in the requirements. 
+- The server should execute and run properly on the CS.UKY.EDU systems.
+- You should adhere to the guide Dr. Finkel wrote on good programming
+practices. I will grade more strictly on these guidelines for this
+assignment!
+
+-------------------------------------------------------------------------
+Part 1:
+- Your project will create an HTML form with three (required) fields:
+- fileToSearch
+- statToSearch
+- functWanted
+
+
+- fileToSearch should be a <SELECT> field dynamically populated by
+your program.
+
+The valid values should be read from a file in the directory
+your PHP script resides named UKgames.json. An example will be
+provided. This file will contain a JSON object with two nested
+objects: "files" and "stats".
+
+"files" will contain pairs of values in the form:
+"descriptor": "filename.json"
+
+Example: "Y2015": "UKmball2016.json"
+
+"descriptor" will be the label you will present to the user as
+the <SELECT> labels for the fileToSearch.
+
+From there you have (2) options - you can make the VALUE for that
+SELECT the second field of the pairs ("filename.json") or simply
+send the descriptor. If you send the descriptor your PHP script
+will need to look at the second value to get the filename. If
+you send the filename, you will need to sanitize it for security
+reasons, or at least verify it is a value choice.
+
+- statToSearch will be the second <SELECT> field, also dynamically
+populated via the UKgames.json object. The second nested object,
+"stats", will contain pairs of values in the form:
+"index": "statistic"
+
+Example: "0": "Points"
+
+You should make the VALUE for this SELECT the statistics from this
+JSON object.
+
+NOTE NOTE: You should NOT have any hard-coded "statistics" anywhere
+in your code. You should expect that the JSON files/objects given
+are non-exhaustive examples only. statToSearch should be completely
+dynamic to your program! See example/hint below on how to do this.
+
+- functWanted will be the last <SELECT> field and will be a simple
+static element of two values "High" and "Low".
+
+--------------------------------------------------------------------------
+Part 2:
+
+- Your PHP script will accept GET requests to search the files
+discovered from UKgames.json. You should take the (3) fields:
+fileToSearch, statToSearch, functWanted and search the JSON
+objects accordingly.
+
+Steps:
+Verify/validate the fileToSearch - return appropriate error messages
+if this field is invalid in any way!
+
+Determine the filename to search based on fileToSearch value.
+
+Read the JSON entries from that file. Decode them to either
+objects or arrays.
+
+Based on the functWanted (either High or Low), traverse the objects
+(games) from the JSON entries and determine which game had the
+High or Low stat the user specified in statToSearch.
+
+Output the the game's information to the user's browser.
+
+If the statistic does not exist for whatever reason, output an
+appropriate error message.
+
+If more than one game shares the High or Low statistic, you can
+either output all games with the shared statistic or just one,
+programmer's choice. Document your choice in your search function.
+
+--------------------------------------------------------------------------
+PHP Functions Needed/Suggested
+
+
+$_GET[] is an array populated by the PHP interpreter. It will contain
+the form values (if they exist). You can use it to determine if your
+script is executing initially (draw the form) or is being submitted
+with search values (process the form).
+
+isset() will tell you if a variable is set: 
+isset($_GET['fileToSearch'])
+isset($_GET['statToSearch'])
+isset($_GET['functWanted'])
+
+I would strongly suggest you write a function that takes a filename
+and reads the contents into a string and returns the contents either
+as a string or as a JSON object/array.
+
+file_get_contents() will read in a file and return its contents in
+a string.
+
+strlen() will return the length of a string.
+
+json_decode() will take a string and produce a JSON object. Note the
+object might (probably will!) be made up of multiple objects.
+
+NOTE NOTE: json_decode()'s second parameter is a boolean. If set to
+true it will produce an array of JSON objects. If false (default) it
+will produce a stdObject type, which will contain other nested objects.
+
+json_last_error() should be called after json_decode() to make sure
+the JSON object was valid. For non-zero values there was a error!
+
+var_dump() will output a representation of a variable - use this for
+debug!
+
+array_keys() will produce just the indices/keys of an array (helpful
+if they are non-numeric. This isn't necessarily needed. See examples.
+
+
+foreach() - a looping conditional that will enumerate a object (or array)
+splitting it apart as you direct. See examples.
+
+========================================================
+The -> (arrow) syntax is used to reference sub-Objects.
+
+If you use json_decode() to produce a JSON object from the UKgames.json
+string, for example, you could access the two objects 'files' and 'stats'
+via the following syntax:
+
+// pre-condition: $filesJSON is a string of JSON objects
+
+$results = json_decode($filesJSON);
+
+$enumFiles = $results->files;
+$enumStats = $results->stats;
+
+// NOTE that the => operator is different from the -> operator!
+foreach($enumStats as $key => $value) {
+// do something with $key and/or $value
+}
+
+If you have a sub-Object (say, Points) that you could access via:
+$games->Points
+
+And, you have a variable "statToSearch" = "Points" then you could
+access the above entry like:
+
+$games->$statToSearch
+
+========================================================
+
+The arrow syntax is not supported in strings.
+
+You can do the following:
+
+echo "The answer is $answer";
+
+You cannot do the following:
+
+echo "The answer is $the->answer";
+
+You must do:
+
+echo "The answer is ", $the->answer;
+
+=====================================================================
+DO THIS:
+
+Create your program to process searches via the command-line! Do not
+attempt to do this via the browser. You will lose error messages!
+
+Run your program via "php ./project3.php", working on the searching
+part (manually setting the search parameters). Once this is working
+then add the HTML form and such and begin testing via the browser!!!
